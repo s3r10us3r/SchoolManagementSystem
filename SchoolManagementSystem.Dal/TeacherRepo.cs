@@ -6,7 +6,7 @@ namespace SchoolManagementSystem.Dal
 {
     public class TeacherRepo : BaseRepo<Teacher>, ITeacherRepo
     {
-        public TeacherRepo(DbContext db) : base(db)
+        public TeacherRepo(SmsDbContext db) : base(db)
         {
         }
     }

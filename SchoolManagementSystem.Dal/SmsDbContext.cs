@@ -16,10 +16,17 @@ namespace SchoolManagementSystem.Dal
         public DbSet<User> Users { get; set; }
         public DbSet<UserRequest> UserRequests { get; set; }
 
+        public SmsDbContext()
+        {
+            Database.EnsureCreated();
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.
                 UseLazyLoadingProxies();
+            optionsBuilder.UseSqlite("Data Source=sms.db");
         }
+
     }
 }

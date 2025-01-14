@@ -7,7 +7,7 @@
         public int StudentId { get; set; }
         public DateOnly Date { get; set; }
 
-        public virtual User Student { get; set; }
+        public virtual Student Student { get; set; }
         public virtual Assignment Assignment { get; set; }
     }
 }

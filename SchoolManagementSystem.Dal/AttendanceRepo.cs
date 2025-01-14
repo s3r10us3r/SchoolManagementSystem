@@ -6,7 +6,7 @@ namespace SchoolManagementSystem.Dal
 {
     public class AttendanceRepo : BaseRepo<Attendance>, IAttendanceRepo
     {
-        public AttendanceRepo(DbContext db) : base(db)
+        public AttendanceRepo(SmsDbContext db) : base(db)
         {
         }
     }

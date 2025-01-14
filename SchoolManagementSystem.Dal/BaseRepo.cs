@@ -10,7 +10,7 @@ namespace SchoolManagementSystem.Dal
         protected DbContext Db { get; private init; }
         protected DbSet<T> Table { get; private init; }
 
-        public BaseRepo(DbContext db)
+        public BaseRepo(SmsDbContext db)
         {
             Db = db;
             Table = db.Set<T>();

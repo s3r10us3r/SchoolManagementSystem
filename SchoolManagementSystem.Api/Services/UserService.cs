@@ -36,29 +36,22 @@ namespace SchoolManagementSystem.Api.Services
             };
 
             user = await _userRepo.CreateAsync(user);
-
             if (request.Role == UserRole.Student)
             {
-                var student = new Student
-                {
-                    FirstName = request.FirstName,
-                    LastName = request.LastName,
-                    BirthDate = request.BirthDate,
-                    User = user,
-                };
-                await _studentRepo.CreateAsync(student);
-            } else
-            {
-                var teacher = new Teacher
-                {
-                    FirstName = request.FirstName,
-                    LastName = request.LastName,
-                    BirthDate = request.BirthDate,
-                    User = user
-                };
-                await _teacherRepo.CreateAsync(teacher);
+                var student = await _studentRepo.GetByIdAsync(request.BindingId);
+                if (student == null)
+                    throw new InvalidOperationException("Student not found");
+                student.UserId = user.Id;
+                await _studentRepo.UpdateAsync(student);
             }
-            await _userRequestRepo.DeleteAsync(request);
+            else if (request.Role == UserRole.Teacher)
+            {
+                var teacher = await _teacherRepo.GetByIdAsync(request.BindingId);
+                if (teacher == null)
+                    throw new InvalidOperationException("Teacher not found");
+                teacher.UserId = user.Id;
+                await _teacherRepo.UpdateAsync(teacher);
+            }
         }
 
         public async Task DeleteUser(int userId)
@@ -73,12 +66,12 @@ namespace SchoolManagementSystem.Api.Services
                 await _teacherRepo.DeleteAsync(teacher);
         }
 
-        public async Task<string?> LoginUser(LoginDto loginDto)
+        public async Task<(string token, string role)?> LoginUser(LoginDto loginDto)
         {
             var user = await _userRepo.FindAsync(u => u.Login == loginDto.Login);
             if (user == null || _passwordHasher.VerifyHashedPassword(null!, user.PasswordHash, loginDto.Password) != PasswordVerificationResult.Success)
                 return null;
-            return _jwtService.GetJwtForUser(user);
+            return (_jwtService.GetJwtForUser(user), user.Role.ToString());
         }
     }
 }

@@ -6,7 +6,7 @@ namespace SchoolManagementSystem.Dal
 {
     public class UserRequestRepo : BaseRepo<UserRequest>, IUserRequestRepo
     {
-        public UserRequestRepo(DbContext db) : base(db)
+        public UserRequestRepo(SmsDbContext db) : base(db)
         {
         }
     }

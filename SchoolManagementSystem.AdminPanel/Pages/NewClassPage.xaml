@@ -1,0 +1,316 @@
+﻿<Page x:Class="SchoolManagementSystem.AdminPanel.Pages.NewClassPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="NewClassPage">
+
+    <!-- 
+        Page Resources:
+        - We mimic styles from UsersPage:
+            * ThemedButtonStyle for primary actions
+            * Possibly a light background for the form
+        - A separate CancelButtonStyle for secondary actions
+        - A more consistent Label style (similar font sizes, etc.)
+        - A clean TextBox style that blends well 
+    -->
+    <Page.Resources>
+        <!-- 
+            You could reuse ThemedButtonStyle exactly from the UsersPage
+            if you want them identical. For clarity, we define them again here
+            but you can simply copy from the UsersPage resources and rename 
+            if you prefer. 
+        -->
+        <Style x:Key="ThemedButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#333" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="20" />
+            <Setter Property="Margin" Value="10,5" />
+            <Setter Property="BorderBrush" Value="Transparent" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}" 
+                                BorderThickness="{TemplateBinding BorderThickness}" 
+                                CornerRadius="5"
+                                Padding="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#555" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#444" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- For a secondary/cancel style, we can lightly invert it. -->
+        <Style x:Key="CancelButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#F0F0F0" />
+            <Setter Property="Foreground" Value="#333" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Padding" Value="20" />
+            <Setter Property="Margin" Value="10,5" />
+            <Setter Property="BorderBrush" Value="#CCC" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5"
+                                Padding="5">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E0E0E0" />
+                    <Setter Property="Foreground" Value="#000" />
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#D0D0D0" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- 
+            A 'ThemedLabelStyle' to unify our text blocks that act as labels.
+            This style is somewhat close to what we see for headings or sub-headings
+            in the UsersPage. 
+        -->
+        <Style x:Key="ThemedLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Margin" Value="10,5" />
+            <Setter Property="Foreground" Value="Black" />
+        </Style>
+
+        <!-- 
+            A style for general input fields, close to what you had, 
+            but corners and fonts might be tweaked for consistency.
+        -->
+        <Style x:Key="ThemedTextBoxStyle" TargetType="TextBox">
+            <Setter Property="Margin" Value="10,5" />
+            <Setter Property="Padding" Value="4,2" />
+            <Setter Property="FontSize" Value="16" />
+            <Setter Property="Foreground" Value="Black" />
+            <Setter Property="BorderBrush" Value="#CCC" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="Background" Value="White" />
+        </Style>
+
+        <!-- 
+            A style for major section headers. We’ll use these for "New Class Form" 
+            or "Teachers", "Students", if you want. 
+        -->
+        <Style x:Key="SectionHeaderStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="20" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Margin" Value="0,0,0,5" />
+            <Setter Property="Foreground" Value="Black" />
+        </Style>
+
+        <!-- 
+            A style for smaller help text or instructions.
+        -->
+        <Style x:Key="HelpTextStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="Foreground" Value="Gray" />
+            <Setter Property="Margin" Value="0,0,0,15" />
+        </Style>
+    </Page.Resources>
+
+    <!-- 
+        Main Layout:
+        - Give the whole page a little padding or margin
+        - White or neutral background for the content area, consistent with the DataGrid area in UsersPage
+    -->
+    <Grid Background="White" Margin="20">
+        <Grid.RowDefinitions>
+            <!-- Form Header -->
+            <RowDefinition Height="Auto" />
+            <!-- Form Fields -->
+            <RowDefinition Height="*" />
+            <!-- Buttons -->
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- FORM HEADER -->
+        <StackPanel Grid.Row="0" Orientation="Vertical">
+            <TextBlock Text="New Class Form"
+                       Style="{StaticResource SectionHeaderStyle}" />
+            <TextBlock Text="Fill in the details below to create a new class."
+                       Style="{StaticResource HelpTextStyle}" />
+        </StackPanel>
+
+        <!-- FORM FIELDS -->
+        <Grid Grid.Row="1" Margin="0,10,0,20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="150" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <!-- Grade -->
+            <TextBlock Text="Grade:"
+                       Style="{StaticResource ThemedLabelStyle}"
+                       Grid.Row="0" Grid.Column="0"
+                       VerticalAlignment="Center" />
+            <ComboBox SelectedItem="{Binding Grade}"
+                      Grid.Row="0" Grid.Column="1"
+                      FontSize="15" 
+                      Margin="10,5" 
+                      Width="80"
+                      HorizontalAlignment="Left">
+                <ComboBox.ItemsSource>
+                    <x:Array Type="{x:Type sys:Int32}" 
+                             xmlns:sys="clr-namespace:System;assembly=mscorlib">
+                        <sys:Int32>1</sys:Int32>
+                        <sys:Int32>2</sys:Int32>
+                        <sys:Int32>3</sys:Int32>
+                        <sys:Int32>4</sys:Int32>
+                        <sys:Int32>5</sys:Int32>
+                        <sys:Int32>6</sys:Int32>
+                        <sys:Int32>7</sys:Int32>
+                        <sys:Int32>8</sys:Int32>
+                    </x:Array>
+                </ComboBox.ItemsSource>
+            </ComboBox>
+
+            <!-- Name -->
+            <TextBlock Text="Name:"
+                       Style="{StaticResource ThemedLabelStyle}"
+                       Grid.Row="1" Grid.Column="0"
+                       VerticalAlignment="Center" />
+            <TextBox Text="{Binding Name}"
+                     Style="{StaticResource ThemedTextBoxStyle}"
+                     Grid.Row="1" Grid.Column="1" />
+
+            <!-- Teacher Section -->
+            <TextBlock Text="Teacher:"
+                       Style="{StaticResource ThemedLabelStyle}"
+                       Grid.Row="2" Grid.Column="0"
+                       VerticalAlignment="Center" />
+            <Grid Grid.Row="2" Grid.Column="1" Margin="10,5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Search:"
+                           Style="{StaticResource ThemedLabelStyle}"
+                           FontSize="16"
+                           Grid.Row="0" Grid.Column="0"
+                           VerticalAlignment="Center"
+                           Margin="0,0,5,0" />
+                <TextBox Text="{Binding TeacherSearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource ThemedTextBoxStyle}"
+                         FontSize="16"
+                         Margin="0,5,0,10"
+                         Grid.Row="0" Grid.Column="1" />
+
+                <ListBox ItemsSource="{Binding FilteredTeachers}"
+                         SelectionMode="Single"
+                         SelectedItem="{Binding SelectedTeacher}"
+                         Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="5,2">
+                                <TextBlock Text="{Binding FirstName}" FontSize="16" />
+                                <TextBlock Text="{Binding LastName}" FontSize="16" Margin="5,0,0,0" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+
+            <!-- Students Section -->
+            <TextBlock Text="Students:"
+                       Style="{StaticResource ThemedLabelStyle}"
+                       Grid.Row="3" Grid.Column="0"
+                       VerticalAlignment="Top" />
+            <Grid Grid.Row="3" Grid.Column="1" Margin="10,5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="Search:"
+                           Style="{StaticResource ThemedLabelStyle}"
+                           FontSize="16"
+                           Grid.Row="0" Grid.Column="0"
+                           VerticalAlignment="Center"
+                           Margin="0,0,5,0" />
+                <TextBox Text="{Binding StudentSearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource ThemedTextBoxStyle}"
+                         FontSize="16"
+                         Margin="0,5,0,10"
+                         Grid.Row="0" Grid.Column="1" />
+
+                <ListBox ItemsSource="{Binding FilteredStudents}"
+                         SelectionMode="Multiple"
+                         Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                    <i:Interaction.Triggers>
+                        <i:EventTrigger EventName="SelectionChanged">
+                            <i:InvokeCommandAction Command="{Binding StudentsChangedCommand}"
+                                                   CommandParameter="{Binding SelectedItems, RelativeSource={RelativeSource AncestorType=ListBox}}" />
+                        </i:EventTrigger>
+                    </i:Interaction.Triggers>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Margin="5,2">
+                                <TextBlock Text="{Binding FirstName}" FontSize="16" />
+                                <TextBlock Text="{Binding LastName}" FontSize="16" Margin="5,0,0,0" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Grid>
+
+        <!-- SUBMIT AND CANCEL BUTTONS -->
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    Grid.Row="2">
+            <!-- Reusing the ThemedButtonStyle from the page resources -->
+            <Button Content="Submit"
+                    Style="{StaticResource ThemedButtonStyle}"
+                    Command="{Binding SubmitCommand}" />
+
+            <!-- Secondary or Cancel button -->
+            <Button Content="Cancel"
+                    Style="{StaticResource CancelButtonStyle}"
+                    Command="{Binding CancelCommand}" />
+        </StackPanel>
+    </Grid>
+</Page>

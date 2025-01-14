@@ -6,7 +6,7 @@ namespace SchoolManagementSystem.Dal
 {
     public class AssignmentRepo : BaseRepo<Assignment>, IAssignmentRepo
     {
-        public AssignmentRepo(DbContext db) : base(db)
+        public AssignmentRepo(SmsDbContext db) : base(db)
         {
         }
     }

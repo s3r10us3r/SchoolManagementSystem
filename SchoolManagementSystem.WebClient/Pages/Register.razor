@@ -1,0 +1,113 @@
+﻿@page "/register"
+@using SchoolManagementSystem.Shared.Services
+@using SchoolManagementSystem.Shared.WebServices.Interfaces
+@inject IUserWebService UserWebService
+@inject PasswordValidator PasswordValidator
+@inject NavigationManager NavigationManager
+
+<PageTitle>School Management System - register</PageTitle>
+
+
+<div class="d-flex flex-column align-items-center justify-content-center">
+    <div class="card">
+        <div class="card-body px-5">
+            <h2 class="text-center">Register</h2>
+            <EditForm Model="Model">
+                <div class="d-flex align-items-center justify-content-center flex-column px-4 rounded">
+                    <div class="form-group m-2">
+                        <label for="login">Login:</label>
+                        <InputText id="login" class="form-control" @bind-Value="Model.Login" placeholder="Enter login"/>
+                    </div>
+                    <div class="invalid-feedback d-block">
+                        @LoginErrorMessage
+                    </div>
+                    <div class="form-group my-2">
+                        <label for="password">Password:</label>
+                        <InputText type="password" id="password" class="form-control" @bind-Value="Model.Password" placeholder="Enter password"/>
+                    </div>
+                    <div class="invalid-feedback d-block">
+                        @PasswordErrorMessage
+                    </div>
+                    <div class="form-group my-2">
+                        <label for="repeat-password">Repeat password:</label>
+                        <InputText type="password" id="password" class="form-control" @bind-Value="RepeatPassword" placeholder="Enter password"/>
+                    </div>
+                    <div class="invalid-feedback d-block">
+                        @RepeatPasswordErrorMessage
+                    </div>
+                    <div class="form-group m-2">
+                        <label for="code">Registration code:</label>
+                        <InputText id="code" class="form-control" @bind-Value="Model.Code" placeholder="Enter registration code"/>
+                    </div>
+                    <div class="invalid-feedback d-block">
+                        @RegistrationCodeErrorMessage
+                    </div>
+                    <button class="btn btn-large btn-dark m-2" @onclick="Submit">Submit</button>
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+@code {
+    private string RepeatPassword { get; set; } = "";
+    private RegisterUserDto Model { get; set; } = new RegisterUserDto();
+
+    private string PasswordErrorMessage { get; set; } = "";
+    private string RepeatPasswordErrorMessage { get; set; } = "";
+    private string RegistrationCodeErrorMessage { get; set; } = "";
+    private string LoginErrorMessage { get; set; } = ""; 
+
+    protected override void OnInitialized()
+    {
+        Model = new RegisterUserDto();
+    }
+
+    public async Task Submit()
+    {
+        RepeatPasswordErrorMessage = "";
+        PasswordErrorMessage = "";
+        LoginErrorMessage = "";
+        RegistrationCodeErrorMessage = "";
+        if (Model.Password != RepeatPassword)
+        {
+            RepeatPasswordErrorMessage = "Passwords do not match";
+        }
+        if (!PasswordValidator.IsPasswordValid(Model.Password, out var message))
+        {
+            PasswordErrorMessage = message;
+        }
+        if (Model.Login.Length < 6)
+        {
+            LoginErrorMessage = "Login must be at least 6 characters long";
+        }
+        if (Model.Code.Length != 36)
+        {
+            RegistrationCodeErrorMessage = "Registration code must be 36 characters long";
+        }
+        if (PasswordErrorMessage != "" || RepeatPasswordErrorMessage != "" || LoginErrorMessage != "" || RegistrationCodeErrorMessage != "")
+        {
+            StateHasChanged();
+            return;
+        }
+        var result = await UserWebService.RegisterUser(Model);
+        if (result.IsSuccess)
+        {
+            NavigationManager.NavigateTo($"/{true}");
+        } 
+        else 
+        {
+            if (result.StatusCode == 409)
+            {
+                LoginErrorMessage = "User with this login already exists";
+            }
+            else if (result.StatusCode == 401)
+            {
+                RegistrationCodeErrorMessage = "Invalid registration code";
+            }
+            else 
+            {
+                RegistrationCodeErrorMessage = "An error occurred, try again later.";
+            }
+        }
+    }
+}

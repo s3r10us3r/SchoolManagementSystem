@@ -10,8 +10,4 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="9.0.0" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\SchoolManagementSystem.Shared\SchoolManagementSystem.Shared.csproj" />
-  </ItemGroup>
-
 </Project>

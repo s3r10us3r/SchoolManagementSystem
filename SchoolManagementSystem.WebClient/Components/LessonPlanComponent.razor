@@ -1,0 +1,119 @@
+﻿@using SchoolManagementSystem.Shared.Dtos
+
+<div class="container mt-4">
+    <h3 class="text-center mb-4">Lesson Plan</h3>
+    <div class="table-responsive">
+        <div class="d-flex flex-column">
+            <!-- Header Row -->
+            <div class="d-flex border-bottom" style="height: 40px;">
+                <!-- Reduced row height -->
+                <div class="p-2 border-end text-center" style="width: 100px;">Time</div>
+                @for (var day = 1; day <= 5; day++)
+                {
+                    <div class="p-2 border-end text-center flex-grow-1">@GetDayName(day)</div>
+                }
+            </div>
+
+            <!-- Time Rows -->
+            @for (var hour = 6; hour < 18; hour++)
+            {
+                @for (var minute = 0; minute < 60; minute += 30)
+                {
+                    <div class="d-flex border-bottom" style="height: 40px;">
+                        <!-- Reduced row height -->
+                        <div class="p-2 border-end text-center" style="width: 100px;">
+                            @($"{hour:D2}:{minute:D2}")
+                        </div>
+                        @for (var day = 1; day <= 5; day++)
+                        {
+                            <div class="p-2 border-end flex-grow-1 position-relative">
+                                @foreach (var lessonOccurrence in FilterLessonOccurrencesByDay(day))
+                                {
+                                    if (lessonOccurrence.Occurrence.StartTime.Hour == hour && lessonOccurrence.Occurrence.StartTime.Minute == minute)
+                                    {
+                                        var height = CalculateBoxHeight(lessonOccurrence.Occurrence.Duration);
+                                        <div class="lesson-card text-white text-center p-2 rounded"
+                                             style="@GetLessonCardStyle(lessonOccurrence.LessonId); height: @height; position: absolute; top: 0;">
+                                            <strong>@lessonOccurrence.LessonName</strong><br />
+                                            Teacher: @lessonOccurrence.TeacherFirstName @lessonOccurrence.TeacherLastName<br />
+                                            @lessonOccurrence.Occurrence.StartTime - @lessonOccurrence.Occurrence.StartTime.Add(lessonOccurrence.Occurrence.Duration)
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public List<LessonWithTeacherDto> Lessons { get; set; } = new();
+
+    private record LessonOccurrence(
+        int LessonId,
+        string LessonName,
+        string TeacherFirstName,
+        string TeacherLastName,
+        OccuranceDto Occurrence);
+
+    private IEnumerable<LessonOccurrence> FilterLessonOccurrencesByDay(int dayOfWeek)
+    {
+        if (Lessons == null || !Lessons.Any())
+        {
+            Console.WriteLine("Lessons list is null or empty.");
+            return Enumerable.Empty<LessonOccurrence>();
+        }
+
+        // Map occurrences to their corresponding lessons
+        return Lessons
+            .Where(l => l?.Occurances != null)
+            .SelectMany(l => l.Occurances.Select(o => new LessonOccurrence(
+                LessonId: l.Id,
+                LessonName: l.Name,
+                TeacherFirstName: l.Teacher?.FirstName ?? "Unknown",
+                TeacherLastName: l.Teacher?.LastName ?? "Teacher",
+                Occurrence: o)))
+            .Where(lo => lo.Occurrence.DayOfWeek == dayOfWeek);
+    }
+
+    private string CalculateBoxHeight(TimeSpan duration)
+    {
+        var heightPerMinute = 1.0; // Adjusted for shorter lesson boxes
+        return $"{duration.TotalMinutes * heightPerMinute}px";
+    }
+
+    private string GetLessonCardStyle(int lessonId)
+    {
+        var color = GetLessonColor(lessonId);
+        return $"background-color: {color}; width: 100%;";
+    }
+
+    private Dictionary<int, string> LessonColors { get; set; } = new();
+
+    private string GetLessonColor(int lessonId)
+    {
+        if (!LessonColors.ContainsKey(lessonId))
+        {
+            // Generate consistent unique color for each lesson
+            var random = new Random(lessonId.GetHashCode());
+            LessonColors[lessonId] = $"#{random.Next(0x1000000):X6}";
+        }
+        return LessonColors[lessonId];
+    }
+
+    private string GetDayName(int day)
+    {
+        return day switch
+        {
+            1 => "Monday",
+            2 => "Tuesday",
+            3 => "Wednesday",
+            4 => "Thursday",
+            5 => "Friday",
+            _ => ""
+        };
+    }
+}

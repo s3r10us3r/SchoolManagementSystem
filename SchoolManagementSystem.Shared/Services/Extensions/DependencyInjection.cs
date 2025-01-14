@@ -1,4 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using SchoolManagementSystem.Shared.WebServices;
+using SchoolManagementSystem.Shared.WebServices.Interfaces;
 
 namespace SchoolManagementSystem.Shared.Services.Extensions
 {

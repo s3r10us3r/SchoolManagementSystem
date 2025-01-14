@@ -6,7 +6,7 @@ namespace SchoolManagementSystem.Dal
 {
     public class OccuranceRepo : BaseRepo<Occurence>, IOccuranceRepo
     {
-        public OccuranceRepo(DbContext db) : base(db)
+        public OccuranceRepo(SmsDbContext db) : base(db)
         {
         }
     }

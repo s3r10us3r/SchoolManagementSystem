@@ -6,7 +6,7 @@ namespace SchoolManagementSystem.Dal
 {
     public class ClassRepo : BaseRepo<Class>, IClassRepo
     {
-        public ClassRepo(DbContext db) : base(db)
+        public ClassRepo(SmsDbContext db) : base(db)
         {
         }
     }
