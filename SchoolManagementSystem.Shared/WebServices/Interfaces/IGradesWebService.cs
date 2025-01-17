@@ -2,13 +2,9 @@
 
 namespace SchoolManagementSystem.Shared.WebServices.Interfaces
 {
-    public interface IAssignmentsWebService
+    public interface IGradesWebService
     {
-        Task<Result> Create(AssignmentDto dto);
-        Task<Result<AssignmentDto>> Get(int id);
-        Task<Result> Update(AssignmentDto assignmentDto);
-        Task<Result> Delete(int id);
-        Task<Result> GradeAssignment(List<GradeDto> grades, int id);
-        Task<Result<List<AssignmentDto>>> GetRecent();
+        Task<Result<List<GradeWithDataDto>>> GetAllGradesAsync();
+        Task<Result> UpdateGrade(int id, GradeDto gradeDto);
     }
 }

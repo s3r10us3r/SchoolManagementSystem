@@ -1,0 +1,55 @@
+﻿@page "/grades"
+@inject IGradesWebService GradesWebService
+@inject NavigationManager NavigationManager
+
+<RedirectToLogin />
+
+<PageTitle>My Grades</PageTitle>
+
+<div class="container">
+    <h2 class="mb-4">My Grades</h2>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Lesson</th>
+                <th>Assignment</th>
+                <th>Grade</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (GradesList != null && GradesList.Any())
+            {
+                @foreach (var grade in GradesList)
+                {
+                    <tr>
+                        <td>@grade.ClassName</td>
+                        <td>@grade.AssignmentName</td>
+                        <td><span class="badge bg-success">@grade.Value</span></td>
+                        <td>@grade.Date.ToString("yyyy-MM-dd")</td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="4">No grades available.</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private List<GradeWithDataDto> GradesList { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await GradesWebService.GetAllGradesAsync();
+        if (result.IsSuccess)
+        {
+            GradesList = result.Data!;
+        }
+    }
+}

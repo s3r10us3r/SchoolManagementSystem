@@ -1,0 +1,63 @@
+﻿@page "/assignments/manage"
+@using SchoolManagementSystem.WebClient.Components
+@inject IAssignmentsWebService AssignmentsWebService
+@inject NavigationManager NavigationManager
+
+<RedirectToLogin />
+
+<PageTitle>Manage Assignments</PageTitle>
+
+<div class="container">
+    <h2 class="mb-4">Manage Assignments</h2>
+
+    <div class="list-group">
+        @if (Assignments != null && Assignments.Any())
+        {
+            @foreach (var assignment in Assignments)
+            {
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>
+                        <strong>@assignment.Name</strong> (Date: @assignment.Date)
+                    </span>
+                    <div>
+                        <button class="btn btn-warning me-2" @onclick="() => GradeAssignment(assignment.Id)">Grade</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteAssignment(assignment.Id)">Delete</button>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p>No assignments available.</p>
+        }
+    </div>
+</div>
+
+@code {
+    private List<AssignmentDto> Assignments { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadAssignments();
+    }
+
+    private async Task LoadAssignments()
+    {
+        var result = await AssignmentsWebService.GetRecent();
+        if (result.IsSuccess && result.Data != null)
+        {
+            Assignments = result.Data!;
+        }
+    }
+
+    private void GradeAssignment(int assignmentId)
+    {
+        NavigationManager.NavigateTo($"/assignments/grade/{assignmentId}");
+    }
+
+    private async Task DeleteAssignment(int assignmentId)
+    {
+        await AssignmentsWebService.Delete(assignmentId);
+        await LoadAssignments();
+    }
+}

@@ -1,10 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SchoolManagementSystem.Dal.Interfaces;
+using SchoolManagementSystem.Models;
 using SchoolManagementSystem.Shared.Dtos;
 
 namespace SchoolManagementSystem.Api.Controllers
 {
+    [Route("api/[controller]")]
     public class GradesController : ControllerJwtAuthBase
     {
         private readonly IGradeRepo _gradeRepo;
@@ -27,7 +29,8 @@ namespace SchoolManagementSystem.Api.Controllers
             var student = await _studentRepo.FindAsync(s => s.UserId == id);
             if (student == null)
                 return NotFound();
-            return Ok(student.Grades.ToList());
+            var result = student.Grades.Select(GetGradeWithDataDto).ToList();
+            return Ok(result);
         }
 
         [HttpPut("{id:int}")]
@@ -40,6 +43,17 @@ namespace SchoolManagementSystem.Api.Controllers
             grade.Value = gradeDto.Value;
             grade.Date = DateOnly.FromDateTime(DateTime.Now);
             return NoContent();
+        }
+
+        private GradeWithDataDto GetGradeWithDataDto(Grade grade)
+        {
+            return new GradeWithDataDto
+            {
+                Value = grade.Value,
+                Date = grade.Date,
+                AssignmentName = grade.Assignment.Name,
+                ClassName = grade.Assignment.Lesson.Name,
+            };
         }
     }
 }

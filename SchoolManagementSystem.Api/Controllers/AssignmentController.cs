@@ -38,7 +38,7 @@ namespace SchoolManagementSystem.Api.Controllers
             if (await _lessonRepo.GetByIdAsync(assignmentDto.LessonId) == null)
                 return NotFound(new MessageDto("Invalid lesson"));
             await _assignmentRepo.CreateAsync(model);
-            return CreatedAtAction(nameof(Get), model.Id);
+            return Ok();
         }
 
         [HttpGet("{id:int}")]
@@ -112,13 +112,16 @@ namespace SchoolManagementSystem.Api.Controllers
             var userIdNullable = GetUserId();
             if (userIdNullable == null)
                 return Unauthorized();
+
             var userId = userIdNullable.Value;
             var roleNullable = GetUserRole();
             if (roleNullable == null)
                 return Unauthorized();
+
             var role = roleNullable.Value;
             if (role == UserRole.Teacher)
                 return await GetTeachersRecentAssignment(userId);
+
             return Ok();
         }
 
@@ -127,9 +130,14 @@ namespace SchoolManagementSystem.Api.Controllers
             var teacher = await _teacherRepo.GetByIdAsync(userId);
             if (teacher == null)
                 return Unauthorized();
+
             var lessons = await _lessonRepo.FilterAsync(l => l.TeacherId == teacher.Id);
             var assignments = lessons.SelectMany(l => l.Assignments).ToList();
+
+            Console.WriteLine($"Found {assignments.Count} assignments for teacher {teacher.Id}"); // ✅ LOGGING FIX
+
             return Ok(assignments.OrderByDescending(a => a.Date).Take(5).Select(a => a.ToDto()).ToList());
         }
+
     }
 }

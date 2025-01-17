@@ -1,42 +1,18 @@
 ﻿@page "/dashboard"
-@using SchoolManagementSystem.Shared.WebServices
-@using SchoolManagementSystem.Shared.WebServices.Interfaces
 @using SchoolManagementSystem.WebClient.Components
-@inject ILessonsWebService LessonWebService
-@inject NavigationManager NavigationManager
 @inject BearerLoginService BearerLoginService
 
-@if(FailedToLoad)
+<RedirectToLogin />
+
+@if (BearerLoginService.UserRole == "Student")
 {
-    <p>Failed</p>
-    <p>@Message</p>
-    <p>@StatusCode</p>
+    <StudentDashboard />
+}
+else if (BearerLoginService.UserRole == "Teacher")
+{
+    <TeacherDashboard />
 }
 else
 {
-    <LessonPlanComponent Lessons="Lessons"></LessonPlanComponent>
-}
-
-@code {
-    private List<LessonWithTeacherDto> Lessons { get; set; }
-    private bool FailedToLoad { get; set; }
-    private string Message { get; set; } = "";
-    private int StatusCode { get; set; } = -1;
-    private Result<List<LessonWithTeacherDto>> Result;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var result = await LessonWebService.GetYour();
-        Result = result;
-        if (result.IsSuccess)
-        {
-            Lessons = result.Data;
-        }
-        else
-        {
-            FailedToLoad = true;
-            Message = result.Message;
-            StatusCode = result.StatusCode;
-        }
-    }
+    <p>Unauthorized access.</p>
 }

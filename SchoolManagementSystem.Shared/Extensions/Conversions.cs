@@ -146,6 +146,7 @@ namespace SchoolManagementSystem.Shared.Extensions
                 Name = assignment.Name,
                 LessonId = assignment.LessonId,
                 Date = assignment.Date,
+                Id = assignment.Id,
             };
         }
     }

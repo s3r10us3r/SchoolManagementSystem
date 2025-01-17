@@ -1,0 +1,48 @@
+﻿@page "/login"
+@inject BearerLoginService BearerLoginService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Login</PageTitle>
+
+<div class="d-flex flex-column align-items-center justify-content-center">
+    <div class="card">
+        <div class="card-body">
+            <h2 class="text-center">Login</h2>
+            <EditForm Model="Model" OnSubmit="Submit">
+                <div class="d-flex align-items-center justify-content-center flex-column px-4 rounded">
+                    <div class="form-group m-2">
+                        <label for="loginInput">Login:</label>
+                        <InputText class="form-control" id="loginInput" placeholder="Enter login" @bind-Value="Model.Login" />
+                    </div>
+                    <div class="form-group m-2">
+                        <label for="passwordInput">Password:</label>
+                        <InputText type="password" class="form-control" id="passwordInput" placeholder="Enter password" @bind-Value="Model.Password" />
+                    </div>
+                    <button class="btn btn-dark m-2">Log in</button>
+                    @if (!string.IsNullOrEmpty(ErrorMessage))
+                    {
+                        <p class="text-danger">@ErrorMessage</p>
+                    }
+                </div>
+            </EditForm>
+        </div>
+    </div>
+</div>
+
+@code {
+    private LoginDto Model { get; set; } = new LoginDto();
+    private string ErrorMessage { get; set; } = "";
+
+    private async Task Submit()
+    {
+        var success = await BearerLoginService.Login(Model.Login, Model.Password);
+        if (success)
+        {
+            NavigationManager.NavigateTo("/dashboard");
+        }
+        else
+        {
+            ErrorMessage = "Invalid login credentials.";
+        }
+    }
+}

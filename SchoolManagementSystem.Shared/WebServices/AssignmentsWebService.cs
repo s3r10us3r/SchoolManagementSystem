@@ -7,11 +7,17 @@ namespace SchoolManagementSystem.Shared.WebServices
     public class AssignmentsWebService : IAssignmentsWebService
     {
         private readonly HttpClient _httpClient;
+
+        public AssignmentsWebService(HttpClient httpClient)
+        {
+            _httpClient = httpClient;
+        }
+
         public async Task<Result> Create(AssignmentDto dto)
         {
             try
             {
-                var response = await _httpClient.PostAsJsonAsync("/Assignments", dto);
+                var response = await _httpClient.PostAsJsonAsync("/Assignment", dto);
                 if (response.IsSuccessStatusCode)
                 {
                     return Result.Success((int)response.StatusCode);
@@ -29,7 +35,7 @@ namespace SchoolManagementSystem.Shared.WebServices
 
         public async Task<Result> Delete(int id)
         {
-            var response = await _httpClient.DeleteAsync($"/Assignments/{id}");
+            var response = await _httpClient.DeleteAsync($"/Assignment/{id}");
             if (response.IsSuccessStatusCode)
             {
                 return Result.Success((int)response.StatusCode);
@@ -42,7 +48,7 @@ namespace SchoolManagementSystem.Shared.WebServices
 
         public async Task<Result<AssignmentDto>> Get(int id)
         {
-            var response = await _httpClient.GetAsync($"/Assignments/{id}");
+            var response = await _httpClient.GetAsync($"/Assignment/{id}");
             if (response.IsSuccessStatusCode)
             {
                 var assignment = await response.Content.ReadFromJsonAsync<AssignmentDto>();
@@ -60,7 +66,7 @@ namespace SchoolManagementSystem.Shared.WebServices
 
         public async Task<Result<List<AssignmentDto>>> GetRecent()
         {
-            var response = await _httpClient.GetAsync("/Assignments/getRecent");
+            var response = await _httpClient.GetAsync("/Assignment/getRecent");
             if (response.IsSuccessStatusCode)
             {
                 var assignments = await response.Content.ReadFromJsonAsync<List<AssignmentDto>>();
@@ -78,7 +84,7 @@ namespace SchoolManagementSystem.Shared.WebServices
 
         public async Task<Result> GradeAssignment(List<GradeDto> grades, int id)
         {
-            var response = await _httpClient.PostAsJsonAsync($"/Assignments/{id}/grade", grades);
+            var response = await _httpClient.PostAsJsonAsync($"/Assignment/{id}/grade", grades);
             if (response.IsSuccessStatusCode)
             {
                 return Result.Success((int)response.StatusCode);
@@ -91,7 +97,7 @@ namespace SchoolManagementSystem.Shared.WebServices
 
         public async Task<Result> Update(AssignmentDto assignmentDto)
         {
-            var response = await _httpClient.PutAsJsonAsync($"/Assignments", assignmentDto);
+            var response = await _httpClient.PutAsJsonAsync($"/Assignment", assignmentDto);
             if (response.IsSuccessStatusCode)
             {
                 return Result.Success((int)response.StatusCode);

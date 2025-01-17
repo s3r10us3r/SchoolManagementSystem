@@ -1,0 +1,114 @@
+﻿@using SchoolManagementSystem.WebClient.Components
+@inject ILessonsWebService LessonsWebService
+@inject IAssignmentsWebService AssignmentsWebService
+@inject IGradesWebService GradesWebService
+@inject NavigationManager NavigationManager
+
+<RedirectToLogin />
+
+<PageTitle>Student Dashboard</PageTitle>
+
+<div class="container">
+    <h2 class="mb-4">Student Dashboard</h2>
+
+    <div class="row">
+        <!-- Lesson Plan Section -->
+        <div class="col-md-4">
+            <h3>Your Lesson Plan</h3>
+            <div class="list-group">
+                @if (Lessons != null && Lessons.Any())
+                {
+                    @foreach (var lesson in Lessons)
+                    {
+                        <div class="list-group-item">
+                            <strong>@lesson.Name</strong> - @lesson.Teacher.FirstName @lesson.Teacher.LastName
+                            <ul>
+                                @foreach (var occurance in lesson.Occurances)
+                                {
+                                    <li>@(occurance.DayOfWeek) - @(occurance.StartTime.ToString("hh:mm tt"))</li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>No upcoming lessons.</p>
+                }
+            </div>
+        </div>
+
+        <!-- Upcoming Assignments Section -->
+        <div class="col-md-4">
+            <h3>Upcoming Assignments</h3>
+            <div class="list-group">
+                @if (Assignments != null && Assignments.Any())
+                {
+                    @foreach (var assignment in Assignments)
+                    {
+                        <div class="list-group-item">
+                            <strong>@assignment.Name</strong> (Due: @assignment.Date)
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>No upcoming assignments.</p>
+                }
+            </div>
+        </div>
+
+        <!-- Grades Section -->
+        <div class="col-md-4">
+            <h3>Your Grades</h3>
+            <div class="list-group">
+                @if (Grades != null && Grades.Any())
+                {
+                    @foreach (var grade in Grades)
+                    {
+                        <div class="list-group-item">
+                            <strong>@grade.AssignmentName</strong> - @grade.ClassName
+                            <span class="badge bg-success float-end">@grade.Value</span>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>No grades available.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<LessonWithTeacherDto> Lessons { get; set; } = new();
+    private List<AssignmentDto> Assignments { get; set; } = new();
+    private List<GradeWithDataDto> Grades { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadStudentDashboard();
+    }
+
+    private async Task LoadStudentDashboard()
+    {
+        var lessonsResult = await LessonsWebService.GetYour(); // Returns List<LessonWithTeacherDto>
+        if (lessonsResult.IsSuccess)
+        {
+            Lessons = lessonsResult.Data!;
+        }
+
+        var assignmentsResult = await AssignmentsWebService.GetRecent();
+        if (assignmentsResult.IsSuccess)
+        {
+            Assignments = assignmentsResult.Data!;
+        }
+
+        var gradesResult = await GradesWebService.GetAllGradesAsync();
+        if (gradesResult.IsSuccess)
+        {
+            Grades = gradesResult.Data!;
+        }
+    }
+}

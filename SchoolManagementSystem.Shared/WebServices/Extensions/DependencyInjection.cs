@@ -14,6 +14,7 @@ namespace SchoolManagementSystem.Shared.WebServices.Extensions
             services.AddTransient<IStudentsWebService, StudentsWebService>();
             services.AddTransient<ILessonsWebService, LessonsWebService>();
             services.AddTransient<IAssignmentsWebService, AssignmentsWebService>();
+            services.AddTransient<IGradesWebService, GradesWebService>();
         }
     }
 }

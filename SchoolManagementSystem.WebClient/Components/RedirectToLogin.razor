@@ -1,0 +1,12 @@
+﻿@inject NavigationManager NavigationManager
+@inject BearerLoginService BearerLoginService
+
+@code {
+    protected override void OnInitialized()
+    {
+        if (!BearerLoginService.IsAuthenticated)
+        {
+            NavigationManager.NavigateTo("/login");
+        }
+    }
+}
